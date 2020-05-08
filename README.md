@@ -2,12 +2,12 @@
 
 Manage your db versions with pure SQL in a framework/language agnostic way
 
-Scriba allows you to write your migrations (up and down) scripts in pure sql and manage it no matter which languages or frameworks your application is build on
+Scriba allows you to write your migrations (and rollbacks) scripts in pure sql and manage it no matter which languages or framework your application is build on
 
 ## How it works?
 
 * You write your migration scripts in multiple sql files (One per migration)
-* You write undo migration scripts (One per migration)
+* You write rollbacks (undo) migrations scripts (One per migration)
 * You setup data access params in a configuration file
 * Run `scriba` to do/undo/list you migrations
 
@@ -37,7 +37,7 @@ CREATE TABLE car(
 )
 ```
 
-And the undo migration script named: `V<version_number>_snake_case_name>.sql`
+And the rollback migration script named: `V<version_number>_snake_case_name>.sql`
 
 *Version number should match exactly with migrate file, you can use whatever you want for the name part*
  
@@ -49,7 +49,7 @@ DROP TABLE user;
 
 ### Place scripts on right directories
 
-Put all your *up* migrations in a dedicated directory, and all the *down* migrations into a different one, you should have a structure similar to:
+Put all your *up* migrations in a dedicated directory, and all the *rollback* migrations into a different one, you should have a structure similar to:
 
 ```bash
 |-migrations/
@@ -72,6 +72,10 @@ datasource:
   username: developer
   password: d3v3lopm3nt
   database: cars
+
+migrations:
+  up_path: up/
+  down_path: down/
 ```
 
 *Refer to [place_link_here](http://something.com) for a detailed list of possible settings
