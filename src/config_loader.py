@@ -20,3 +20,6 @@ class ConfigLoader:
 
     def get_datasource(self):
         return self.config['datasource']
+
+    def get_migrations_path(self):
+        return self.config['migrations_path']
