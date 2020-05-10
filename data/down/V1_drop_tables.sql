@@ -1,0 +1,2 @@
+DROP TABLE car;
+DROP TABLE user;
