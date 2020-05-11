@@ -2,10 +2,12 @@
 Provides utilities to connect and retrieve/update database
 records from migrations tracking table
 """
+from datetime import datetime
 
 import mysql.connector
 import logging
 from config_loader import ConfigLoader
+from migrations_scanner import ScriptMetadata
 from enum import Enum
 
 logger = logging.getLogger()
@@ -46,6 +48,17 @@ class Migration:
         self.status_update = status_update
         self.file_path = file_path
 
+    @staticmethod
+    def from_row(row):
+        return Migration(
+            db_id=row[0],
+            version=row[1],
+            name=row[2],
+            status=MigrationStatus(row[3]),
+            status_update=row[4],
+            file_path=row[5]
+        )
+
     def as_row(self, include_id=False, include_path=False):
         row = []
 
@@ -55,7 +68,7 @@ class Migration:
         row.extend([
             self.version,
             self.name,
-            self.status,
+            self.status.value,
             self.status_update
         ])
 
@@ -67,9 +80,7 @@ class Migration:
 
 class MigrationsDao:
     def __init__(self):
-        self._conn = self._get_connection()
         self._MIGRATIONS_TABLE = "migrations"
-
         self._COL_ID = "id"
         self._COL_VERSION = "version"
         self._COL_NAME = "name"
@@ -77,75 +88,108 @@ class MigrationsDao:
         self._COL_STATUS_UPDATE = "status_update"
         self._COL_FILE_PATH = "file_path"
 
+        self._conn = self._get_connection()
+        self._verify_table()
+
     def destroy(self):
         self._conn.close()
 
-    def get_migrations(self):
-        if self._is_table_created():
-            query = "SELECT * FROM migrations ORDER BY {}"\
-                .format(self._COL_VERSION)
+    def upsert(self, metadata_list):
+        """
+        Updates or inserts a list  metadata files as migration objects
 
-            cursor = self._conn.cursor()
-            cursor.execute(query)
-            db_migrations = cursor.fetchall()
+        :param metadata_list: Migration files to process
+        :type metadata_list: list[ScriptMetadata]
+        """
 
-            migrations = []
-            for db_migration in db_migrations:
-                row = list(db_migration)
-                migrations.append(Migration(
-                    db_id=row[0],
-                    version=row[1],
-                    name=row[2],
-                    status=row[3],
-                    status_update=row[4],
-                    file_path=row[5]
-                ))
+        for metadata in metadata_list:
+            migration = self.find_by_version(metadata.version)
 
-            return migrations
+            if not migration:
+                migration = Migration(
+                    version=metadata.version,
+                    status=MigrationStatus.PENDING,
+                    status_update=datetime.now()
+                )
 
-        else:
-            logger.warning("Migrations table not found")
-            return []
+            migration.name = metadata.name
+            migration.file_path = metadata.file_path
+            self.save(migration)
 
-    def upsert(self, migration):
-        self._verify_table()
+    def save(self, migration):
         cursor = self._conn.cursor()
+        db_migration = self.find_by_version(migration.version)
 
-        if self._is_migration_registered(migration.version):
-            query = "UPDATE {} SET name='{}', file_path='{}' WHERE {} = '{}'"
+        if db_migration:
+            query = """
+                UPDATE {} SET 
+                    name='{}',
+                    status='{}',
+                    status_update='{}',
+                    file_path='{}'
+                WHERE {} = '{}'
+            """
+
             cursor.execute(query.format(
                 self._MIGRATIONS_TABLE,
                 migration.name,
+                migration.status.value,
+                migration.status_update.strftime("%Y-%m-%d %H:%M:%S"),
                 migration.file_path,
                 self._COL_VERSION,
                 migration.version
             ))
         else:
-            query = "INSERT INTO {} VALUES (NULL, '{}', '{}', '{}', NOW(), '{}')"
+            query = """
+                INSERT INTO {} VALUES(
+                    NULL,
+                    '{}',
+                    '{}',
+                    '{}',
+                    '{}',
+                    '{}'
+                )
+            """
             cursor.execute(query.format(
                 self._MIGRATIONS_TABLE,
                 migration.version,
                 migration.name,
-                MigrationStatus.PENDING.value,
+                migration.status.value,
+                migration.status_update.strftime("%Y-%m-%d %H:%M:%S"),
                 migration.file_path
             ))
 
-        self._conn.commit()
         cursor.close()
+        self._conn.commit()
 
-    def _is_migration_registered(self, version):
+    def find_all(self):
+        query = "SELECT * FROM {} ORDER BY {}"
+
+        cursor = self._conn.cursor()
+        cursor.execute(query.format(
+            self._MIGRATIONS_TABLE,
+            self._COL_VERSION
+        ))
+
+        return [Migration.from_row(row) for row in cursor.fetchall()]
+
+    def find_by_version(self, version):
         cursor = self._conn.cursor()
 
-        query = "SELECT COUNT(*) FROM {} WHERE {} = '{}'"
+        query = "SELECT * FROM {} WHERE {} = '{}' LIMIT 1"
         cursor.execute(query.format(
             self._MIGRATIONS_TABLE,
             self._COL_VERSION,
             version
         ))
 
-        migration_exists = cursor.fetchone()[0] == 1
+        db_migration = cursor.fetchone()
         cursor.close()
-        return migration_exists
+
+        if db_migration:
+            return Migration.from_row(db_migration)
+
+        return None
 
     def _verify_table(self):
         if not self._is_table_created():

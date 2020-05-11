@@ -1,6 +1,12 @@
 import os
-from migrations_dao import Migration
 from config_loader import ConfigLoader
+
+
+class ScriptMetadata:
+    def __init__(self, version, name, file_path):
+        self.version=version
+        self.name=name
+        self.file_path=file_path
 
 
 class ScriptsCollector:
@@ -18,7 +24,7 @@ class ScriptsCollector:
             .replace("_", " ")\
             .capitalize()
 
-        return Migration(
+        return ScriptMetadata(
             version=version,
             name=name,
             file_path=os.path.abspath(file)

@@ -1,4 +1,5 @@
 import logging
+import argparse
 from migrations_scanner import ScriptsCollector
 from migrations_dao import MigrationsDao
 from tabulate import tabulate
@@ -14,7 +15,7 @@ logger.addHandler(ch)
 migrations_dao = MigrationsDao()
 
 
-def scan(silent_mode=True):
+def scan():
     """
     Looks for migration scripts and registers it into
     database migrations table
@@ -23,21 +24,35 @@ def scan(silent_mode=True):
     """
 
     collector = ScriptsCollector()
-
-    for migration in collector.migrations:
-        migrations_dao.upsert(migration)
-
-    if not silent_mode:
-        logger.info("{} migrations has been processed"
-                    .format(len(collector.migrations)))
+    migrations_dao.upsert(collector.migrations)
 
 
 def status():
     scan()
-    migrations = migrations_dao.get_migrations()
+    migrations = migrations_dao.find_all()
     headers = ["Version", "Name", "Status", "Status Update"]
     table = (migration.as_row() for migration in migrations)
     logger.info(tabulate(table, headers, tablefmt="psql"))
 
 
-status()
+def migrate(steps=None):
+    pass
+
+
+parser = argparse.ArgumentParser()
+parser.add_argument(
+    "action",
+    type=str,
+    help="Action to execute: [status|migrate|rollback"
+)
+parser.add_argument(
+    "-s",
+    "--steps",
+    type=int,
+    help="Number of scripts to run"
+)
+
+args = parser.parse_args()
+if args.action == "status":
+    status()
+    # print(migrations_dao.find_by_version("V1"))
