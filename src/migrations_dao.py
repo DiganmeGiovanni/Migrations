@@ -6,9 +6,17 @@ records from migrations tracking table
 import mysql.connector
 import logging
 from config_loader import ConfigLoader
+from enum import Enum
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
+
+
+class MigrationStatus(Enum):
+    PENDING = "Pending"
+    APPLIED = "Applied"
+    ERROR = "Error"
+    REVERTED = "Reverted"
 
 
 class Migration:
@@ -118,7 +126,7 @@ class MigrationsDao:
                 self._MIGRATIONS_TABLE,
                 migration.version,
                 migration.name,
-                "PENDING",  # TODO Use enum python equivalent
+                MigrationStatus.PENDING.value,
                 migration.file_path
             ))
 
