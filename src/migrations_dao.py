@@ -173,6 +173,22 @@ class MigrationsDao:
 
         return [Migration.from_row(row) for row in cursor.fetchall()]
 
+    def find_all_non_applied(self):
+        """
+        Retrieves all migrations with status different of applied
+        :return: list[Migration]
+        """
+        query = "SELECT * FROM {} WHERE {} <> '{}' ORDER BY {}"
+        cursor = self._conn.cursor()
+        cursor.execute(query.format(
+            self._MIGRATIONS_TABLE,
+            self._COL_STATUS_UPDATE,
+            MigrationStatus.APPLIED.value,
+            self._COL_VERSION
+        ))
+
+        return [Migration.from_row(row) for row in cursor.fetchall()]
+
     def find_by_version(self, version):
         cursor = self._conn.cursor()
 
