@@ -1,5 +1,6 @@
 import logging
 import argparse
+import migrations_runner
 from migrations_scanner import ScriptsCollector
 from migrations_dao import MigrationsDao
 from tabulate import tabulate
@@ -12,6 +13,7 @@ ch = logging.StreamHandler()
 ch.setLevel(logging.DEBUG)
 logger.addHandler(ch)
 
+collector = ScriptsCollector()
 migrations_dao = MigrationsDao()
 
 
@@ -22,8 +24,6 @@ def scan():
 
     :return:
     """
-
-    collector = ScriptsCollector()
     migrations_dao.upsert(collector.migrations)
 
 
@@ -36,7 +36,15 @@ def status():
 
 
 def migrate(steps=None):
-    pass
+    scan()
+    if migrations_runner.migrate(migrations_dao, steps):
+        status()
+
+
+def rollback(steps=None):
+    scan()
+    if migrations_runner.rollback(collector, migrations_dao, steps):
+        status()
 
 
 parser = argparse.ArgumentParser()
@@ -55,4 +63,7 @@ parser.add_argument(
 args = parser.parse_args()
 if args.action == "status":
     status()
-    # print(migrations_dao.find_by_version("V1"))
+if args.action == "migrate":
+    migrate()
+if args.action == "rollback":
+    rollback()

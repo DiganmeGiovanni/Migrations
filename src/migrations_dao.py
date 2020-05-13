@@ -6,7 +6,7 @@ from datetime import datetime
 
 import mysql.connector
 import logging
-from config_loader import ConfigLoader
+from db_helper import db_connection
 from migrations_scanner import ScriptMetadata
 from enum import Enum
 
@@ -88,7 +88,7 @@ class MigrationsDao:
         self._COL_STATUS_UPDATE = "status_update"
         self._COL_FILE_PATH = "file_path"
 
-        self._conn = self._get_connection()
+        self._conn = db_connection()
         self._verify_table()
 
     def destroy(self):
@@ -173,6 +173,24 @@ class MigrationsDao:
 
         return [Migration.from_row(row) for row in cursor.fetchall()]
 
+    def find_all_applied(self, desc=True):
+        """
+        Retrieves all applied migrations from database
+        :param desc: If true, migrations will be descending ordered by version
+        :type desc: bool
+        :return: list[Migration]
+        """
+        query = "SELECT * FROM {} WHERE {} = '{}' ORDER BY version {}"
+        cursor = self._conn.cursor()
+        cursor.execute(query.format(
+            self._MIGRATIONS_TABLE,
+            self._COL_STATUS,
+            MigrationStatus.APPLIED.value,
+            'DESC' if desc else 'ASC'
+        ))
+
+        return [Migration.from_row(row) for row in cursor.fetchall()]
+
     def find_all_non_applied(self):
         """
         Retrieves all migrations with status different of applied
@@ -251,23 +269,3 @@ class MigrationsDao:
         except mysql.connector.Error as e:
             logger.error("'{}' table could not be created {}"
                          .format(self._MIGRATIONS_TABLE, e))
-
-    @staticmethod
-    def _get_connection():
-        config_loader = ConfigLoader()
-        connection = None
-
-        try:
-            datasource = config_loader.get_datasource()
-
-            connection = mysql.connector.connect(
-                host=datasource['host'],
-                user=datasource['username'],
-                passwd=datasource['password'],
-                database=datasource['database']
-            )
-
-        except mysql.connector.Error as e:
-            logger.error("Error during connection: {}".format(e))
-
-        return connection

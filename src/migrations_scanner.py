@@ -33,3 +33,10 @@ class ScriptsCollector:
     def _collect_scripts(self, path):
         files = os.listdir(path)
         return [self._get_metadata(path, file) for file in files if file.endswith(".sql")]
+
+    def get_rollback(self, version):
+        for rollback_file in self.rollbacks:
+            if rollback_file.version == version:
+                return rollback_file
+
+        return None
