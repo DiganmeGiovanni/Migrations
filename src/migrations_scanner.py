@@ -17,7 +17,7 @@ class ScriptsCollector:
         self.migrations = self._collect_scripts(migrations_path['up'])
         self.rollbacks = self._collect_scripts(migrations_path['down'])
 
-    def _get_metadata(self, file):
+    def _get_metadata(self, path, file):
         migration_parts = os.path.splitext(file)[0].split("_", 1)
         version = migration_parts[0]
         name = migration_parts[1]\
@@ -27,9 +27,9 @@ class ScriptsCollector:
         return ScriptMetadata(
             version=version,
             name=name,
-            file_path=os.path.abspath(file)
+            file_path=os.path.abspath(os.path.join(path, file))
         )
 
     def _collect_scripts(self, path):
         files = os.listdir(path)
-        return [self._get_metadata(file) for file in files if file.endswith(".sql")]
+        return [self._get_metadata(path, file) for file in files if file.endswith(".sql")]
