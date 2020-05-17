@@ -1,5 +1,5 @@
 """
-Utilities to reads and process configuration file
+Utilities to read and process configuration file
 """
 
 import os
