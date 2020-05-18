@@ -11,7 +11,6 @@ test_data_path = os.path.join(
 )
 
 
-# noinspection PyProtectedMember
 class TestFileScanner:
 
     @patch('config_loader.ConfigLoader')
