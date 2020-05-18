@@ -38,8 +38,6 @@ class AbstractScanner(metaclass=abc.ABCMeta):
         self.up_path = path_conf['up']
         self.down_path = path_conf['down']
 
-        self.migrations_metadata = self._scan()
-
     def _scan(self):
         """
         Scans for migrations and rollbacks in up and down paths and parses
