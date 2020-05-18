@@ -1,0 +1,9 @@
+datasource:
+  host: localhost
+  username: root
+  password: root
+  database: migrations
+
+migrations_path:
+  up: /Users/nsf-aguirre/Sources/Python/Scriba/tests/data/up/
+  down: /Users/nsf-aguirre/Sources/Python/Scriba/tests/data/down
