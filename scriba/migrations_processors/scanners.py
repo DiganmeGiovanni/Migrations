@@ -16,15 +16,15 @@ class AbstractScanner(metaclass=abc.ABCMeta):
     @classmethod
     def __subclasshook__(cls, subclass):
         return (
-            hasattr(subclass, '_scan') and
-            callable(subclass._scan) and
-            hasattr(subclass, '_parse_name') and
-            callable(subclass._parse_name) and
-            hasattr(subclass, '_find_rollback') and
-            callable(subclass._find_rollback) and
-            hasattr(subclass, 'get_commands') and
-            callable(subclass.get_commands) or
-            NotImplemented
+                hasattr(subclass, 'scan') and
+                callable(subclass.scan) and
+                hasattr(subclass, '_parse_name') and
+                callable(subclass._parse_name) and
+                hasattr(subclass, '_find_rollback') and
+                callable(subclass._find_rollback) and
+                hasattr(subclass, 'get_commands') and
+                callable(subclass.get_commands) or
+                NotImplemented
         )
 
     def __init__(self, conf_loader):
@@ -38,7 +38,7 @@ class AbstractScanner(metaclass=abc.ABCMeta):
         self.up_path = path_conf['up']
         self.down_path = path_conf['down']
 
-    def _scan(self):
+    def scan(self):
         """
         Scans for migrations and rollbacks in up and down paths and parses
         metadata from file names. Scanned migrations are returned as a list
@@ -81,7 +81,7 @@ class AbstractScanner(metaclass=abc.ABCMeta):
 
 class FileScanner(AbstractScanner):
 
-    def _scan(self):
+    def scan(self):
         files = os.listdir(self.up_path)
         files_metadata = []
 

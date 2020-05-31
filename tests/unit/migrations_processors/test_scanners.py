@@ -25,7 +25,7 @@ class TestFileScanner:
         scanner = FileScanner(mock_conf_loader)
 
         # When
-        migrations_metadata = scanner._scan()
+        migrations_metadata = scanner.scan()
 
         # Then
         assert len(migrations_metadata) == 2
@@ -75,3 +75,18 @@ class TestFileScanner:
             down_path,
             "V3_Add_last_table.sql"
         ))
+
+        rollback_path = scanner._find_rollback("V1.1")
+        assert rollback_path == os.path.abspath(os.path.join(
+            down_path,
+            "V1.1_Add_tables.sql"
+        ))
+
+        rollback_path = scanner._find_rollback("V2")
+        assert rollback_path == os.path.abspath(os.path.join(
+            down_path,
+            "V2_Add_foreign_keys.sql"
+        ))
+
+        rollback_path = scanner._find_rollback("V43")
+        assert not rollback_path
