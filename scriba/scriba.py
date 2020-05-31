@@ -1,69 +1,60 @@
-import logging
-import argparse
-import migrations_runner
-from migrations_scanner import ScriptsCollector
-from migrations_dao import MigrationsDao
 from tabulate import tabulate
-
-logger = logging.getLogger('simple_example')
-logger.setLevel(logging.DEBUG)
-
-# create console handler and set level to debug
-ch = logging.StreamHandler()
-ch.setLevel(logging.DEBUG)
-logger.addHandler(ch)
-
-collector = ScriptsCollector()
-migrations_dao = MigrationsDao()
+from log_utils import logger
+from config_loader import ConfigLoader
+from migrations_processors.scanners import FileScanner
+from migrations_processors.runners import MySQLRunner
+from model.daos import MySQLSchema, MySQLMigrationDao
 
 
-def scan():
-    """
-    Looks for migration scripts and registers it into
-    database migrations table
+class Scriba:
+    def __init__(self, config_file_path):
+        """
+        Initializes scriba client
 
-    :return:
-    """
-    migrations_dao.upsert(collector.migrations)
+        :param config_file_path: Path to configuration file
+        :type config_file_path: str
+        """
+        conf_loader = ConfigLoader(config_file_path)
+        self.scanner = FileScanner(conf_loader)
 
+        schema = MySQLSchema(conf_loader)
+        self.migrations_dao = MySQLMigrationDao(schema)
+        self.runner = MySQLRunner(self.migrations_dao, schema, self.scanner)
 
-def status():
-    scan()
-    migrations = migrations_dao.find_all()
-    headers = ["Version", "Name", "Status", "Status Update"]
-    table = (migration.as_row() for migration in migrations)
-    logger.info(tabulate(table, headers, tablefmt="psql"))
+    def _scan(self):
+        """
+        Looks for migration scripts and registers it into
+        database migrations table
 
+        :return:
+        """
+        migrations_metas = self.scanner.scan()
+        self.migrations_dao.upsert(migrations_metas)
 
-def migrate(steps=None):
-    scan()
-    if migrations_runner.migrate(migrations_dao, steps):
-        status()
+    def status(self, skip_scan=False):
+        """
+        Show status of all migrations, by default will scan directories and
+        update migrations table before list results
 
+        :param skip_scan: if True directory will be scanned before print state
+        :type skip_scan: bool
+        """
+        if not skip_scan:
+            self._scan()
 
-def rollback(steps=None):
-    scan()
-    if migrations_runner.rollback(collector, migrations_dao, steps):
-        status()
+        migrations = self.migrations_dao.find_all()
+        headers = ["Version", "Name", "Status", "Status Update"]
+        table = (migration.as_row() for migration in migrations)
+        logger.info(tabulate(table, headers, tablefmt="psql"))
 
+    def migrate(self, steps=None):
+        self._scan()
 
-parser = argparse.ArgumentParser()
-parser.add_argument(
-    "action",
-    type=str,
-    help="Action to execute: [status|migrate|rollback"
-)
-parser.add_argument(
-    "-s",
-    "--steps",
-    type=int,
-    help="Number of scripts to run"
-)
+        if self.runner.migrate(steps):
+            self.status(skip_scan=True)
 
-args = parser.parse_args()
-if args.action == "status":
-    status()
-if args.action == "migrate":
-    migrate()
-if args.action == "rollback":
-    rollback()
+    def rollback(self, steps=None):
+        self._scan()
+
+        if self.runner.rollback(steps):
+            self.status(skip_scan=True)
