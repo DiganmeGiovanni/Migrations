@@ -151,7 +151,8 @@ class MySQLRunner(AbstractRunner):
         counter = 0
 
         for migration in migrations:
-            if steps is not None and ++counter > steps:
+            counter += 1
+            if steps is not None and counter > steps:
                 break
 
             if self._apply(migration):
@@ -174,7 +175,8 @@ class MySQLRunner(AbstractRunner):
         counter = 0
 
         for migration in migrations:
-            if steps is not None and ++counter > steps:
+            counter += 1
+            if steps is not None and counter > steps:
                 break
 
             if self._unapply(migration):
