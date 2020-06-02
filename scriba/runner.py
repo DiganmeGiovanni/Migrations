@@ -31,7 +31,7 @@ def _parse_args():
 
 def main():
     args = _parse_args()
-    file_path = "/opt/migrations.yml"
+    file_path = "migrations.yml"
 
     if args.config:
         file_path = args.config
