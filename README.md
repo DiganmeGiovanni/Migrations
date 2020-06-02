@@ -1,23 +1,78 @@
 # Scriba
 
-Manage your db versions with pure SQL in a framework/language agnostic way
+Manage your database versions with pure SQL
 
-Scriba allows you to write your migrations (and rollbacks) scripts in pure sql and manage it no matter which languages or framework your application is build on
+Scriba allows you to write your app migrations, rollbacks and data seeding scripts in pure sql, no matter which languages or frameworks your application is build on
+
+## Supported databases
+
+Currently following databases are supported:
+
+- MySQL
+
+Compatibility for following databases is in development
+
+- SQLite
+- Postgres
+- SQL Server 
+
+## Install
+
+### Python PIP
+
+You can use pip:
+```bash
+pip install scriba
+```
+Notice that python3 is required
 
 ## How it works?
 
 * You write your migration scripts in multiple sql files (One per migration)
-* You write rollbacks (undo) migrations scripts (One per migration)
-* You setup data access params in a configuration file
-* Run `scriba` to do/undo/list you migrations
+* You write rollback migration scripts (One per migration)
+* You setup database connection and scripts location in a configuration file
+* Run `scriba` to apply/unapply/list your migrations
 
 ## Getting started
 
-Create you first migration in a sql file, ensure to name the file like: `V<version_number>_<snake_case_name>.sql`
+### Prepare migrations directory
 
-*Follow naming convention is essential in order to run migrations with right name and in appropriate order*
+Create a directory to hold all your database migrations
+
+> Directory location is up to you, but usually you'll want to place it
+> inside your main project or as an independent repository in cases where
+> multiple applications will access same database
+
+Your directory should have a structure like this:
+
+```bash
+|-migrations/
+|- |- migrations.yml 
+|- |- up/
+|- |- - v1_create_tables.sql
+|- |- - v2_create_credentials_table.sql
+|- |- down/
+|- |- - v1_undo_create_tables.sql
+|- |- - v2_destroy_credentials_table.sql
+```
+
+Where:
+- The `up/` directory will hold all your migrations scripts
+- The `down/` directory will hold all you rollback scripts
+- The `migrations.yml` will be used for setup to tell to scriba how to access database
+
+> You can use whatever name you want for your migration directories as long as
+> you specify the right paths in the config file
+
+
+### Create your migrations
+
+Place your first migration inside `up/` directory in a sql file, ensure to name the file like: `V<version_number>_<snake_case_name>.sql`
+
+> Following naming convention is essential in order to scriba run migrations
+> in appropriate order and shows right name to you
  
-Let's say you have following file named `v1_create_tables.sql` (will be parsed as: `V1` `Create tables`)
+Let's say you have following file named `v1_create_tables.sql` (which will be parsed as: Version: `V1`, name: `Create tables`)
 
 ```sql
 CREATE TABLE user(
@@ -37,34 +92,22 @@ CREATE TABLE car(
 )
 ```
 
-And the rollback migration script named: `V<version_number>_snake_case_name>.sql`
+### Create your rollbacks
 
-*Version number should match exactly with migrate file, you can use whatever you want for the name part*
+Place your rollback inside `down/` directory in a sql file, following same name conventions as per migrations: `V<version_number>_snake_case_name>.sql`
+
+> Version number must match exactly with version in migration file, however you can use
+> whatever you want for the name part
  
- `v1_undo_create_tables.sql`:
+Let's say you have: `v1_undo_create_tables.sql`:
  ```sql
 DROP TABLE car;
 DROP TABLE user;
  ```
 
-### Place scripts on right directories
+### Setup database connection and settings
 
-Put all your *up* migrations in a dedicated directory, and all the *rollback* migrations into a different one, you should have a structure similar to:
-
-```bash
-|-migrations/
-|- |- settings.yml 
-|- |- up/
-|- |- - v1_create_tables.sql
-|- |- - v2_create_credentials_table.sql
-|- |- down/
-|- |- - v1_undo_create_tables.sql
-|- |- - v2_destroy_credentials_table.sql
-```
-
-### Setup db connection and settings
-
-Place the database connection settings into `settings.yml` file:
+Place the database connection settings into `migrations.yml` file:
 
 ```yaml
 datasource:
@@ -74,19 +117,27 @@ datasource:
   database: cars
 
 migrations:
-  up_path: up/
-  down_path: down/
+  up: up/
+  down: down/
 ```
 
-*Refer to [place_link_here](http://something.com) for a detailed list of possible settings
+And now let scriba do it's magic ;)
 
-### And now run migrations:
+### Using scriba
+
+`cd` into migrations directory and run one of following commands
 
 ```bash
-<place docker command here> scriba migrate
+scriba status        # Will list all your migrations
+
+scriba mgirate       # Will apply your migrations
+scriba migrate -s 2  # Will apply only '2' non applied migrations
+
+scriba rollback      # Will run you rollback scripts
+scriba rollback -s 2 # Will run rollback scripts for latest '2' applied migrations
 ```
 
 ## What does scriba means?
 
-Scriba *Latin*: Person who registered history in ancient times
+Scriba *(latin)*: Person who registered history in ancient times
 
