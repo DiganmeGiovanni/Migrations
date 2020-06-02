@@ -2,7 +2,6 @@
 Utilities to read and process configuration file
 """
 
-import os
 import yaml
 
 

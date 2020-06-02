@@ -1,12 +1,12 @@
 import abc
-
 import mysql.connector
 
-from model.entities import Migration, MigrationStatus
-from model.daos import AbstractSchema, AbstractMigrationDao
-from migrations_processors.scanners import AbstractScanner
 from datetime import datetime
-from log_utils import logger
+
+from scriba.model.entities import Migration, MigrationStatus
+from scriba.model.daos import AbstractSchema, AbstractMigrationDao
+from scriba.migrations_processors.scanners import AbstractScanner
+from scriba.log_utils import logger
 
 
 class AbstractRunner(metaclass=abc.ABCMeta):

@@ -1,9 +1,9 @@
 from tabulate import tabulate
-from log_utils import logger
-from config_loader import ConfigLoader
-from migrations_processors.scanners import FileScanner
-from migrations_processors.runners import MySQLRunner
-from model.daos import MySQLSchema, MySQLMigrationDao
+from scriba.log_utils import logger
+from scriba.config_loader import ConfigLoader
+from scriba.migrations_processors.scanners import FileScanner
+from scriba.migrations_processors.runners import MySQLRunner
+from scriba.model.daos import MySQLSchema, MySQLMigrationDao
 
 
 class Scriba:

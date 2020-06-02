@@ -1,10 +1,12 @@
 import abc
 import mysql.connector
+
 from datetime import datetime
-from config_loader import ConfigLoader
-from model.entities import Migration, MigrationStatus
-from migrations_processors.scanners import ScriptMetadata
-from log_utils import logger
+
+from scriba.config_loader import ConfigLoader
+from scriba.model.entities import Migration, MigrationStatus
+from scriba.migrations_processors.scanners import ScriptMetadata
+from scriba.log_utils import logger
 
 
 class AbstractSchema(metaclass=abc.ABCMeta):

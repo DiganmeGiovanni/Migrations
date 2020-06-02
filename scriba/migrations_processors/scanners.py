@@ -1,6 +1,7 @@
 import abc
 import os
-from config_loader import ConfigLoader
+
+from scriba.config_loader import ConfigLoader
 
 
 class ScriptMetadata:
