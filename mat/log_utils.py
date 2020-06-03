@@ -1,6 +1,6 @@
 import logging
 
-logger = logging.getLogger("scriba")
+logger = logging.getLogger("mat")
 logger.setLevel(logging.DEBUG)
 
 # Create console handler and set level to debug

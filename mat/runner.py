@@ -1,5 +1,5 @@
 import argparse
-from scriba.scriba import Scriba
+from mat.mat import Mat
 
 
 def _parse_args():
@@ -36,16 +36,16 @@ def main():
     if args.config:
         file_path = args.config
 
-    scriba = Scriba(file_path)
+    mat = Mat(file_path)
 
     if args.action == "status":
-        scriba.status()
+        mat.status()
 
     if args.action == "migrate":
-        scriba.migrate(steps=args.steps)
+        mat.migrate(steps=args.steps)
 
     if args.action == "rollback":
-        scriba.rollback(steps=args.steps)
+        mat.rollback(steps=args.steps)
 
 
 if __name__ == "__main__":

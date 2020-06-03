@@ -1,15 +1,16 @@
 from tabulate import tabulate
-from scriba.log_utils import logger
-from scriba.config_loader import ConfigLoader
-from scriba.migrations_processors.scanners import FileScanner
-from scriba.migrations_processors.runners import MySQLRunner
-from scriba.model.daos import MySQLSchema, MySQLMigrationDao
+
+from mat.log_utils import logger
+from mat.config_loader import ConfigLoader
+from mat.migrations_processors.scanners import FileScanner
+from mat.migrations_processors.runners import MySQLRunner
+from mat.model.daos import MySQLSchema, MySQLMigrationDao
 
 
-class Scriba:
+class Mat:
     def __init__(self, config_file_path):
         """
-        Initializes scriba client
+        Initializes mat client
 
         :param config_file_path: Path to configuration file
         :type config_file_path: str

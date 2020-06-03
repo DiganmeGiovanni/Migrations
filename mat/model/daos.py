@@ -3,10 +3,10 @@ import mysql.connector
 
 from datetime import datetime
 
-from scriba.config_loader import ConfigLoader
-from scriba.model.entities import Migration, MigrationStatus
-from scriba.migrations_processors.scanners import ScriptMetadata
-from scriba.log_utils import logger
+from mat.config_loader import ConfigLoader
+from mat.model.entities import Migration, MigrationStatus
+from mat.migrations_processors.scanners import ScriptMetadata
+from mat.log_utils import logger
 
 
 class AbstractSchema(metaclass=abc.ABCMeta):
