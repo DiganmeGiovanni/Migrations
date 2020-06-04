@@ -5,7 +5,7 @@ with open('README.md') as readme_file:
 
 setup(
     name='mat',
-    version='1.0.0',
+    version='1.0.1',
     description='Manage your database versions with pure SQL',
     long_description=readme,
     long_description_content_type="text/markdown",

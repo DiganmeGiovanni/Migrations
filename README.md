@@ -24,7 +24,32 @@ You can use pip:
 ```bash
 pip install mat
 ```
-Notice that python3 is required
+> MAT depends on python 3, in some systems you would want to use 'pip3' to install programs under python3 environment
+
+### Usage through docker
+
+You don't know pip/python? No problem, you can use 'mat' through docker.
+
+I have created a wrapper script that will invoke `mat` inside docker whenever you need it, just download it inside your migrations directory and use it the same way you would do with `mat` command
+
+Get script
+```bash
+wget https://raw.githubusercontent.com/DiganmeGiovanni/Mat/master/docker/matw
+chmod +x matw # Grant exec permissions to wrapper
+```
+
+Then you can use the wrapper the same way as `mat` command
+```bash
+./matw status
+./matw migrate -s 2
+```
+
+> Check 'Getting started' section to understand what above commands means
+
+Behind scenes the script will:
+1. Create a docker container ready to run 'mat'
+2. Mount current path '$PWD' as a volume in /mat container path
+3. Invoke 'mat' command inside container by forwarding arguments
 
 ## How it works?
 

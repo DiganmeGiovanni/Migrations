@@ -18,4 +18,7 @@ if ! [ -f "./mat.docker" ]; then
   exit 1
 fi
 
-docker build -t mat:"$IMAGE_TAG" -f mat.docker .
+docker build -t giobyte8/mat:"$IMAGE_TAG" -f mat.docker .
+
+echo ""
+echo "You can push image to production with: docker push giobyte8/mat:${IMAGE_TAG}"
