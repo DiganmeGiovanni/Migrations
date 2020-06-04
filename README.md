@@ -1,8 +1,8 @@
-# Scriba
+# MAT - Migration Assistant Tool
 
 Manage your database versions with pure SQL
 
-Scriba allows you to write your app migrations, rollbacks and data seeding scripts in pure sql, no matter which languages or frameworks your application is build on
+MAT allows you to write your app migrations, rollbacks and data seeding scripts in pure sql, no matter which languages or frameworks your application is build on
 
 ## Supported databases
 
@@ -22,7 +22,7 @@ Compatibility for following databases is in development
 
 You can use pip:
 ```bash
-pip install scriba
+pip install mat
 ```
 Notice that python3 is required
 
@@ -31,7 +31,7 @@ Notice that python3 is required
 * You write your migration scripts in multiple sql files (One per migration)
 * You write rollback migration scripts (One per migration)
 * You setup database connection and scripts location in a configuration file
-* Run `scriba` to apply/unapply/list your migrations
+* Run `mat` to apply/unapply/list your migrations
 
 ## Getting started
 
@@ -58,8 +58,8 @@ Your directory should have a structure like this:
 
 Where:
 - The `up/` directory will hold all your migrations scripts
-- The `down/` directory will hold all you rollback scripts
-- The `migrations.yml` will be used for setup to tell to scriba how to access database
+- The `down/` directory will hold all your rollback scripts
+- The `migrations.yml` will be used for setup to specify how to access database
 
 > You can use whatever name you want for your migration directories as long as
 > you specify the right paths in the config file
@@ -69,7 +69,7 @@ Where:
 
 Place your first migration inside `up/` directory in a sql file, ensure to name the file like: `V<version_number>_<snake_case_name>.sql`
 
-> Following naming convention is essential in order to scriba run migrations
+> Follow naming convention is essential in order to run migrations
 > in appropriate order and shows right name to you
  
 Let's say you have following file named `v1_create_tables.sql` (which will be parsed as: Version: `V1`, name: `Create tables`)
@@ -121,23 +121,18 @@ migrations:
   down: down/
 ```
 
-And now let scriba do it's magic ;)
+And now let 'mat' do it's magic ;)
 
-### Using scriba
+### Using mat
 
 `cd` into migrations directory and run one of following commands
 
 ```bash
-scriba status        # Will list all your migrations
+mat status        # Will list all your migrations
 
-scriba mgirate       # Will apply your migrations
-scriba migrate -s 2  # Will apply only '2' non applied migrations
+mat migrate       # Will apply your migrations
+mat migrate -s 2  # Will apply only '2' non applied migrations
 
-scriba rollback      # Will run you rollback scripts
-scriba rollback -s 2 # Will run rollback scripts for latest '2' applied migrations
+mat rollback      # Will run you rollback scripts
+mat rollback -s 2 # Will run rollback scripts for latest '2' applied migrations
 ```
-
-## What does scriba means?
-
-Scriba *(latin)*: Person who registered history in ancient times
-
