@@ -1,0 +1,8 @@
+# Docker image used to run mat
+# by final users
+
+FROM python:3.7.7-stretch
+WORKDIR /mat
+
+RUN pip install --no-cache-dir mat
+ENTRYPOINT ["mat"]

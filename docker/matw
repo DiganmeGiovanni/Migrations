@@ -1,0 +1,14 @@
+#!/bin/bash
+#
+# Mat Wrapper
+# Runs 'mat' inside a container, this script is intended
+# to be used as the 'mat' command
+#
+# Behind scenes this script will:
+# 1. Create a docker container with 'mat'
+# 2. Mount current path '$PWD' as a volume in /mat container path
+# 3. Invoke 'mat' command inside container by passing arguments
+#
+
+MAT_VERSION=1.0.0
+docker run --rm -ti -v "$PWD":/mat mat:"$MAT_VERSION" "$@"
