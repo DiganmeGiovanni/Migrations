@@ -141,7 +141,7 @@ datasource:
   password: d3v3lopm3nt
   database: cars
 
-migrations:
+migrations_path:
   up: up/
   down: down/
 ```
