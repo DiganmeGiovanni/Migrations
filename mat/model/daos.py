@@ -77,14 +77,16 @@ class MySQLSchema(AbstractSchema):
 
     def verify_table(self):
         conn = self.connect()
+        database_name = self.conf_loader.get_datasource()['database']
 
         # Check if table already exists
         cursor = conn.cursor()
         cursor.execute("""
             SELECT COUNT(*)
             FROM information_schema.TABLES
-            WHERE TABLE_NAME = '{}'
-        """.format(AbstractSchema.TABLE))
+            WHERE TABLE_SCHEMA = '{}'
+              AND TABLE_NAME = '{}'
+        """.format(database_name, AbstractSchema.TABLE))
 
         table_exists = cursor.fetchone()[0] == 1
         cursor.close()
