@@ -12,6 +12,9 @@ cd Mat
 pyenv virtualenv 3.7.7 mat
 pyenv local mat
 
+# Alternatively you can use python 'venv' command
+python -m venv .env
+
 # Install development requirements
 pip install -r requirements-dev.txt
 ```
@@ -29,7 +32,7 @@ Point your IDE interpreter to your new virtualenv and you're good to go!
 3. Install generated tar through `pip install dist/mat-<version>.tar.gz`, replace `<version>` with the version generated during setup 2
 4. You should be ready to use `mat` inside your vitualenv
 
-If you're using `pyenv` and want to test `mat` out of your development folder you can open another shell, navigate to desired folder and use `pyenv shell <environment>` command to activate temporally a specific env for that shell session
+> If you're using `pyenv` and want to test `mat` out of your development folder you can open another shell, navigate to desired folder and use `pyenv shell <environment>` command to activate temporally a specific env for that shell session
 
 > Note: For some reason I experienced some failures during first attempt, solution was to close shell session and start a new one
 
@@ -38,3 +41,7 @@ If you're using `pyenv` and want to test `mat` out of your development folder yo
 1. Update version number in `setup.py` file
 2. Create sources distribution with `python setup.py sdist`
 3. Upload through `twine upload dist/mat-<version>.tar.gz`
+
+## Release of new docker image
+
+TODO: Replicate from 'rterminal' project

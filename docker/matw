@@ -10,5 +10,5 @@
 # 3. Invoke 'mat' command inside container by passing arguments
 #
 
-DOCKER_IMAGE_TAG=1.0.1
+DOCKER_IMAGE_TAG=1.0.2
 docker run --rm -ti -v "$PWD":/mat giobyte8/mat:"$DOCKER_IMAGE_TAG" "$@"
