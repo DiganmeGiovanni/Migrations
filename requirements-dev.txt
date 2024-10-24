@@ -1,4 +1,4 @@
-mysql-connector-python==8.0.20
+mysql-connector-python==9.1.0
 PyYAML==5.4
 tabulate==0.8.7
 pytest==5.4.3
